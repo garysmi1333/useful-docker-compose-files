@@ -1,0 +1,30 @@
+---
+services:
+  tsdb-replica:
+    container_name: ${CONTAINER_NAME:-pgai-tsdb-replica}
+    image: timescale/timescaledb-ha:pg17.7-ts2.24.0
+    networks:
+      - default
+    environment:
+      POSTGRES_PORT: ${POSTGRES_PORT:-5433}
+      REPLICA_PASSWORD: ${REPLICA_PASSWORD:-replica_password}
+      POSTGRES_PRIMARY_DB: ${POSTGRES_PRIMARY_DB:-pgai-tsdb-primary}
+      POSTGRES_PRIMARY_DB_PORT: ${POSTGRES_PRIMARY_DB_PORT:-5432}
+      TZ: ${TZ:-UTC} 
+    entrypoint: ["/usr/local/bin/replica-entrypoint.sh"]
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - ai-test_replica_data:/home/postgres/pgdata/data
+      - ./initdb-scripts/10-replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
+      - ./initdb-scripts/30-pg-hba.sh:/docker-entrypoint-initdb.d/30-pg-hba.sh:ro
+
+    restart: unless-stopped
+
+volumes:
+  ai-test_replica_data:
+
+networks:
+  default:
+    name: ${DEFAULT_NETWORK_NAME:-pgai-test-network}
+    external: true

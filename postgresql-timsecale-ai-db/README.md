@@ -1,13 +1,18 @@
 # Postgresql Timescale DB docker-compose.yml
 
-Docker compose files for quickly setting up a Postgres TimescaleDB with read only replication.
+Docker compose files for quickly setting up a Postgres TimescaleDB with read only replication and ai extensions:
 
 ### Extensions
 timescaledb
+vectorscale
+ai
+
 
 ## primary
 
-The primary database that will be replicated
+Creates a database called ai-test-db and an admin user
+user: dev
+password: password
 
 ```
 cd primary

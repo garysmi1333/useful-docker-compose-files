@@ -1,0 +1,38 @@
+---
+services:
+  tsdb-primary:
+    container_name: ${CONTAINER_NAME:-pgai-tsdb-primary}
+    image: timescale/timescaledb-ha:pg17.7-ts2.24.0
+    networks:
+      - default
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      TZ: ${TZ:-UTC}
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=10
+      -c max_replication_slots=10
+      -c shared_preload_libraries=timescaledb
+      -c listen_addresses='*'
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ai-test_primary_data:/home/postgres/pgdata/data
+      - ./initdb-scripts:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  ai-test_primary_data:
+
+networks:
+  default:
+    name: ${DEFAULT_NETWORK_NAME:-pgai-test-network}
+    external: true

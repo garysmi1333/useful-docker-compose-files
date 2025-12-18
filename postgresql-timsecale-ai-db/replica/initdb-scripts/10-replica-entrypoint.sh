@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DATA_DIR=/var/lib/postgresql/data
+DATA_DIR=/home/postgres/pgdata/data
 
 echo "Replica entrypoint starting..."
 
@@ -12,7 +12,7 @@ if [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
   rm -rf "${DATA_DIR:?}"/*
 
 
-  PGPASSFILE=/var/lib/postgresql/.pgpass
+  PGPASSFILE=/home/postgres/.pgpass
   echo "${POSTGRES_PRIMARY_DB}:${POSTGRES_PRIMARY_DB_PORT}:replication:replicator:${REPLICA_PASSWORD}" > "$PGPASSFILE"
   chown postgres:postgres "$PGPASSFILE" || true
   chmod 600 "$PGPASSFILE"
