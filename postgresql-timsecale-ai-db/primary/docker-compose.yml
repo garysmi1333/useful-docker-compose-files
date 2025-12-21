@@ -1,7 +1,7 @@
 ---
 services:
   tsdb-primary:
-    container_name: ${CONTAINER_NAME:-pgai-tsdb-primary}
+    container_name: ${CONTAINER_NAME:-postgres-primary}
     image: timescale/timescaledb-ha:pg17.7-ts2.24.0
     networks:
       - default
@@ -20,7 +20,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - ai-test_primary_data:/home/postgres/pgdata/data
+      - ./postgres_primary_data:/home/postgres/pgdata/data
       - ./initdb-scripts:/docker-entrypoint-initdb.d:ro
     restart: unless-stopped
     healthcheck:
@@ -29,10 +29,7 @@ services:
       timeout: 3s
       retries: 12
 
-volumes:
-  ai-test_primary_data:
-
 networks:
   default:
-    name: ${DEFAULT_NETWORK_NAME:-pgai-test-network}
+    name: ${DEFAULT_NETWORK_NAME:-development-network}
     external: true
