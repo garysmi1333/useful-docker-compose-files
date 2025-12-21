@@ -1,0 +1,37 @@
+---
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    networks:
+      - default
+    container_name: openweb-ui
+    restart: unless-stopped
+    ports:
+      - "3001:8080"
+    volumes:
+      - ./open-webui/data:/app/backend/data
+    environment:
+      - MAX_FILE_SIZE_MB=50
+      - MAX_CHUNKS_PER_DOC=3000
+      - CHUNK_SIZE=1024
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - USE_EMBEDDING_MODEL_DOCKER=nomic-embed-text
+      - RAG_EMBEDDING_MODEL=nomic-embed-text
+      - ENABLE_RAG=True
+  searxng:
+    container_name: searxng
+    image: docker.io/searxng/searxng:latest
+    networks:
+      - default
+    ports:
+      - "3002:8080"
+    volumes:
+      - ./searxng:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+    restart: unless-stopped
+
+networks:
+  default:
+    name: ollama-network
+    external: true
