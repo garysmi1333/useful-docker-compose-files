@@ -1,13 +1,15 @@
 ---
 services:
   ollama:
-    image: ollama/ollama:latest
     container_name: ollama
+    image: ollama/ollama:latest
+    networks:
+      - default
     restart: unless-stopped
     ports:
       - "11434:11434"
     volumes:
-      - ollama:/root/.ollama
+      - ./ollama/data:/root/.ollama
     deploy:
       resources:
         reservations:
@@ -16,19 +18,7 @@ services:
               count: all
               capabilities: [gpu]
 
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
-    restart: unless-stopped
-    ports:
-      - "3000:8080"
-    volumes:
-      - open-webui:/app/backend/data
-    environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
-    depends_on:
-      - ollama
-
-volumes:
-  ollama:
-  open-webui:
+networks:
+  default:
+    name: ollama-network
+    external: true

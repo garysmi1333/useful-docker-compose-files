@@ -2,19 +2,20 @@
 name: Local Config
 version: 1.0.0
 schema: v1
+
 models:
-  - name: qwen2.5-coder-7b
+  - name: Qwen2.5-Coder
     provider: ollama
-    model: qwen2.5-coder:7b
-    apiBase: http://host.docker.internal:11434
+    model: qwen2.5-coder:7b-instruct-q5_K_M
     roles:
       - chat
-      - autocomplete  # Enables inline Tab completion
       - edit
+      - apply
+      - autocomplete
 
-  - name: nomic-embed
+  - name: Nomic-Embed
     provider: ollama
     model: nomic-embed-text
-    apiBase: http://host.docker.internal:11434
     roles:
-      - embed  # Embeddings for @codebase
+      - embed
+      - rerank
