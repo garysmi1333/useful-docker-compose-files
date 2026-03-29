@@ -1,0 +1,65 @@
+services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    networks:
+      - default
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama/data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  searxng:
+    container_name: searxng
+    image: docker.io/searxng/searxng:latest
+    ports:
+      - "3002:8080"
+    volumes:
+      - ./searxng:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080/
+    restart: unless-stopped
+
+  open-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    container_name: open-webui
+    volumes:
+      - ./open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://ollama:11434'
+      - 'WEBUI_SECRET_KEY=cudd!231n'
+      - 'VECTOR_DB=pgvector'
+      - 'PGVECTOR_DB_URL=postgresql://openwebui:password@postgres-primary:5432/openwebui'
+      - 'DATABASE_URL=postgresql://openwebui:password@postgres-primary:5432/openwebui'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+    
+
+networks:
+  default:
+    name: development-network
+    external: true
