@@ -18,6 +18,13 @@ if [ -z "$(ls -A "$DATA_DIR" 2>/dev/null)" ]; then
   chmod 600 "$PGPASSFILE"
   export PGPASSFILE
 
+  # Wait for primary to be ready
+  echo "Waiting for primary ${POSTGRES_PRIMARY_DB}:${POSTGRES_PRIMARY_DB_PORT}..."
+   until PGPASSWORD="${REPLICA_PASSWORD}" pg_isready -h "${POSTGRES_PRIMARY_DB}" -p "${POSTGRES_PRIMARY_DB_PORT}" -U replicator -d replication; do
+  echo "Primary not ready, retrying in 2s..."
+  sleep 2
+done
+
   pg_basebackup \
     -h ${POSTGRES_PRIMARY_DB} \
     -p ${POSTGRES_PRIMARY_DB_PORT} \
