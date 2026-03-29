@@ -1,0 +1,33 @@
+name: Local Config
+version: 1.0.0
+schema: v1
+models:
+  - name: Autodetect
+    provider: ollama
+    model: AUTODETECT
+    roles: ['autocomplete','edit','apply','chat']
+    contextLength: 10240
+    capabilities:
+    - tooluse
+    defaultCompletionOptions:
+      temperature: 0.2
+      contextLength: 8192
+      maxTokens: 1024
+      keepAlive: 1800
+  - name: Nomic Embed
+    provider: ollama
+    model: nomic-embed-text
+    roles: ['embed']
+context:
+  - provider: web
+    params:
+      includeDomains: ["*"]
+      maxResults: 3
+      maxChars: 3000
+  - provider: code
+    params:
+      maxChars: 3000
+  - provider: docs
+  - provider: diff
+  - provider: terminal
+  - provider: codebase
